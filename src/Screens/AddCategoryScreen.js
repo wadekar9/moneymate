@@ -1,22 +1,28 @@
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React, { useState, useRef } from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import CommonHeader from '../Component/CommonHeader';
-import TextInputComponent from '../Component/TextInputComponent';
+import CommonContainer from '../Components/CommonContainer';
+import CommonHeader from '../Components/CommonHeader';
+import TextInputComponent from '../Components/TextInputComponent';
 import { moderateScale, Colors, Fonts, DEVICE_STYLES } from '../Config/Theme';
 import { PlusCircleIcon, GroceriesIcon } from '../Assets/Icons/index';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { triggerSnackMessage } from '../Services/HelperMethod';
+import ScreenLoader from '../Components/ScreenLoader';
+import { useSelector } from 'react-redux';
 
 const AddCategoryScreen = () => {
 
+	const { } = useSelector((state) => state)
 	const bottomSheetRef = useRef(null);
 
 	const [categoryIcon, setCategoryIcon] = useState(null);
-	const [categoryName, setCategoryName] = useState('');
+	const [categoryName, setCategoryName] = useState('Demo Grocery Category');
 
 	return (
 		<CommonContainer>
+
+			<ScreenLoader isVisiable={false} />
+
 			<CommonHeader headerLabel={'Add new category'} />
 
 			<View style={{ flex: 1 }}>

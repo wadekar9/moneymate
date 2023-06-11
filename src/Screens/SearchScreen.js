@@ -1,6 +1,6 @@
 import { FlatList, LayoutAnimation, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
+import CommonContainer from '../Components/CommonContainer';
 import { moderateScale, Colors, Fonts } from '../Config/Theme';
 import { ArrowBackIcon, CafeBarOutlineIcon, BlueCheckedIcon, HealthIcon, RecentArrowIcon, HistoryIcon } from '../Assets/Icons/index';
 import { useNavigation } from '@react-navigation/native';

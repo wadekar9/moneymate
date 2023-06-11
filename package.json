@@ -6,7 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios --simulator='iPhone 14 Pro Max'",
     "lint": "eslint .",
-    "start": "react-native start",
+    "start": "react-native start --reset-cache",
     "gradlewClean": "cd android && ./gradlew clean && cd ..",
     "pods": "cd ios && pod install && cd ..",
     "test": "jest"
@@ -20,7 +20,7 @@
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "appwrite": "^11.0.0",
-    "dayjs": "^1.11.8",
+    "moment": "^2.29.4",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-config": "^1.5.1",
@@ -35,7 +35,10 @@
     "react-native-skeleton-placeholder": "^5.2.4",
     "react-native-snackbar": "^2.6.2",
     "react-native-splash-screen": "^3.3.0",
-    "react-native-svg": "^13.9.0"
+    "react-native-svg": "^13.9.0",
+    "react-redux": "^8.0.7",
+    "redux": "^4.2.1",
+    "redux-thunk": "^2.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

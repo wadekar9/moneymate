@@ -1,11 +1,11 @@
 import { StyleSheet, Text, ScrollView, View, TouchableOpacity, Image } from 'react-native';
 import React, { useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import CommonHeader from '../Component/CommonHeader';
-import TextInputComponent from '../Component/TextInputComponent';
+import CommonContainer from '../Components/CommonContainer';
+import CommonHeader from '../Components/CommonHeader';
+import TextInputComponent from '../Components/TextInputComponent';
 import { Colors, moderateScale, Fonts } from '../Config/Theme';
 import { EditIcon } from '../Assets/Icons/index';
-import { PersonImage } from '../Assets/Images/index'
+import { PERSON_IMAGE } from '../Assets/Images/index'
 import ImagePicker from 'react-native-image-crop-picker';
 
 const ProfileScreen = () => {
@@ -53,7 +53,7 @@ const ProfileScreen = () => {
 						<View style={{ marginVertical: moderateScale(40), alignSelf: 'center' }}>
 							<View style={styles.imageContainer}>
 								<Image
-									source={ !details.imagePath ? PersonImage : { uri : details.imagePath } }
+									source={ !details.imagePath ? PERSON_IMAGE : { uri : details.imagePath } }
 									style={{
 										height : '100%',
 										width : '100%'

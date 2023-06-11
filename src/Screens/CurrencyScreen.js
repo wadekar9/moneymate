@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import CommonHeader from '../Component/CommonHeader';
+import CommonContainer from '../Components/CommonContainer';
+import CommonHeader from '../Components/CommonHeader';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
 import { useNavigation } from '@react-navigation/native';
 

@@ -1,14 +1,18 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useRef, useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import CommonHeader from '../Component/CommonHeader';
+import CommonContainer from '../Components/CommonContainer';
+import CommonHeader from '../Components/CommonHeader';
 import { moderateScale, Colors, Fonts } from '../Config/Theme';
-import DropdownComponent from '../Component/DropdownComponent';
-import TextInputComponent from '../Component/TextInputComponent';
+import DropdownComponent from '../Components/DropdownComponent';
+import TextInputComponent from '../Components/TextInputComponent';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { GroceriesIcon } from '../Assets/Icons/index';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import ScreenLoader from '../Components/ScreenLoader';
+import { triggerSnackMessage } from '../Services/HelperMethod';
+import { AddIncomeExpense } from '../Redux/Actions/IncomeExpense/AddIncomeExpense';
 
 const DropdownData = [
 	{ label: 'Income', value: 'income' },
@@ -19,20 +23,58 @@ const AddIncomeExpenseScreen = () => {
 
 	const bottomSheetRef = useRef(null);
 	const navigation = useNavigation();
+	const dispatch = useDispatch();
 
-	const [modalVisiable, setModalVisiable] = useState(false);
+	const { addIncomeExpenseLoading } = useSelector((state) => state.IncomeExpenseReducer);
+	const { userDetails } = useSelector((state) => state.AuthenticationReducer);
+
 	const [selectedType, setSelectedType] = useState('income');
 	const [details, setDetails] = useState({
 		categoryName: 'Select Category',
+		selectedCategory : null,
 		amount: '',
 		description: ''
 	});
 
+	const handleAddIncomeExpense = () => {
+		if(details.selectedCategory == '00000'){
+			triggerSnackMessage({
+				message : 'Please select category'
+			});
+			return;
+		}
 
-	const toggalModal = () => setModalVisiable(!modalVisiable);
+		if(details.amount.trim().length == 0){
+			triggerSnackMessage({
+				message : 'Please enter amount'
+			});
+			return;
+		}
+
+		const incomeExpenseObject = {
+			type : selectedType,
+			category : 'grocery',
+			amount : details.amount.trim(),
+			description : details.description.trim(),
+			date_time : new Date(),
+			user_id : userDetails.currentUserID
+		}
+
+		dispatch(
+			AddIncomeExpense(
+				incomeExpenseObject,
+				() => {
+					navigation.goBack();
+				}
+			)
+		);
+	}
 
 	return (
 		<CommonContainer>
+
+			<ScreenLoader isVisiable={addIncomeExpenseLoading} />
+
 			<CommonHeader />
 
 			<ScrollView
@@ -50,6 +92,7 @@ const AddIncomeExpenseScreen = () => {
 							label={'Select type'}
 							data={DropdownData}
 							value={selectedType}
+							isRequired={true}
 							onChange={(e) => setSelectedType(e)}
 						/>
 					</View>
@@ -73,6 +116,7 @@ const AddIncomeExpenseScreen = () => {
 						<TextInputComponent
 							label={'Amount'}
 							value={details.amount}
+							isRequired={true}
 							onChange={(e) => setDetails((prev) => ({ ...prev, amount: e }))}
 							placeholder={'Enter Amount'}
 							keyboard={'number-pad'}
@@ -90,7 +134,12 @@ const AddIncomeExpenseScreen = () => {
 					</View>
 				</View>
 
-				<TouchableOpacity style={styles.buttonContainer}>
+				<TouchableOpacity
+					activeOpacity={0.8}
+					accessibilityRole={'button'}
+					style={styles.buttonContainer}
+					onPress={() =>  handleAddIncomeExpense()}
+				>
 					<Text style={styles.buttonContainerText}>Add New {selectedType}</Text>
 				</TouchableOpacity>
 			</ScrollView>

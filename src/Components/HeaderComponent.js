@@ -1,13 +1,14 @@
-import { Image, StyleSheet, View, TouchableOpacity } from 'react-native'
+import { Image, StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 import React, { memo } from 'react'
-import { moderateScale, Colors } from '../Config/Theme';
-import { BrandLogo, PersonImage } from '../Assets/Images/index';
+import { moderateScale, Colors, Fonts } from '../Config/Theme';
 import { SearchIcon } from '../Assets/Icons/index';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 const HeaderComponent = () => {
 
+    const { userDetails } = useSelector((state) => state.AuthenticationReducer);
     const navigation = useNavigation();
 
     return (
@@ -16,15 +17,7 @@ const HeaderComponent = () => {
                 accessibilityRole={'tab'}
                 style={styles.profileContainer}
             >
-                <Image
-                    source={PersonImage}
-                    style={{
-                        height: '100%',
-                        width: '100%',
-                        aspectRatio: 1
-                    }}
-                    resizeMode={'cover'}
-                />
+                <Text style={styles.profileContainerChildText}>{userDetails?.userName?.charAt(0)}</Text>
             </View>
             <View style={{ flex: 1, alignItems: 'flex-end' }}>
                 <TouchableOpacity
@@ -51,14 +44,22 @@ const styles = StyleSheet.create({
         height: moderateScale(48)
     },
     profileContainer: {
-        height: moderateScale(33),
-        width: moderateScale(33),
-        borderRadius: moderateScale(16),
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: Colors.GRAY_200,
-        overflow: 'hidden'
-    },
+		height : moderateScale(48),
+		width : moderateScale(48),
+		borderRadius : moderateScale(48/2),
+		overflow : 'hidden',
+		alignItems : 'center',
+		justifyContent : 'center',
+		backgroundColor : Colors.GREY_800,
+		borderWidth : moderateScale(0.8),
+		borderColor : Colors.GREY_150
+	},
+	profileContainerChildText : {
+		fontFamily : Fonts.SemiBold,
+		fontSize : moderateScale(18),
+		color : Colors.WHITE,
+		textTransform : 'uppercase'
+	},
     searchIconContainer: {
         alignItems: 'center',
         justifyContent: 'center'

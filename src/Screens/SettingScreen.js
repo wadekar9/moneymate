@@ -1,16 +1,21 @@
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
 import React from 'react';
-import CommonContainer from '../Component/CommonContainer';
+import CommonContainer from '../Components/CommonContainer';
 import { Colors, Fonts, moderateScale } from '../Config/Theme';
-import { PersonImage } from '../Assets/Images/index';
+import { PERSON_IMAGE } from '../Assets/Images/index';
 import { CategoryIcon, PDFIcon, DollerIcon, LanguageIcon, FAQIcon, LogOutIcon, SecondaryChevronIcon, ProfileIcon } from '../Assets/Icons/index';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
-import Constant from '../Config/Constant';
+import { Constant } from '../Config/Constant';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteCurrentSession } from '../Redux/Actions/Authentication/DeleteCurrentSession';
+import ScreenLoader from '../Components/ScreenLoader';
 
 const SettingScreen = () => {
 
+	const { userDetails, isLogoutLoading } = useSelector((state) => state.AuthenticationReducer);
 	const navigation = useNavigation();
+	const dispatch = useDispatch();
 
 	const LOCAL_ROUTES_LIST = [
 		{
@@ -52,18 +57,39 @@ const SettingScreen = () => {
 			[
 				{
 					text : 'Cancel',
-					style : 'cancel'
+					style : 'cancel',
+					onPress : () => null
 				},
 				{
 					text : 'Log Out',
-					style : 'destructive'
+					style : 'destructive',
+					onPress : () => logOutUser()
 				}
 			]
 		)
 	}
 
+	const logOutUser = () => {
+		dispatch(
+			deleteCurrentSession(
+				userDetails.currentSessionID,
+				() => {
+					navigation.dispatch(CommonActions.reset({
+						index : 0,
+						routes : [
+							{ name : StackNavigationKeys.Login }
+						]
+					}))
+				}
+			)
+		)
+	}
+
 	return (
 		<CommonContainer>
+
+			<ScreenLoader isVisiable={isLogoutLoading} />
+
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				alwaysBounceVertical={false}
@@ -75,19 +101,20 @@ const SettingScreen = () => {
 
 					<View style={{flexDirection : 'row',alignItems:'center'}}>
 						<View style={styles.imageContainer}>
-							<Image
-								source={PersonImage}
+							{/* <Image
+								source={PERSON_IMAGE}
 								style={{
 									height : '100%',
 									width : '100%'
 								}}
 								alt={'Profile Image'}
 								resizeMode={'cover'}
-							/>
+							/> */}
+							<Text style={styles.imageContainerChildText}>{userDetails?.userName?.charAt(0)}</Text>
 						</View>
 						<View style={{marginLeft : moderateScale(15),flex : 1}}>
-							<Text style={styles.nameStyle}>John Doe</Text>
-							<Text style={styles.emailStyle}>john.doe123@gmail.com</Text>
+							<Text style={styles.nameStyle}>{userDetails.userName}</Text>
+							<Text style={styles.emailStyle}>{userDetails.email}</Text>
 						</View>
 					</View>
 				</View>
@@ -147,7 +174,18 @@ const styles = StyleSheet.create({
 		height : moderateScale(48),
 		width : moderateScale(48),
 		borderRadius : moderateScale(48/2),
-		overflow : 'hidden'
+		overflow : 'hidden',
+		alignItems : 'center',
+		justifyContent : 'center',
+		backgroundColor : Colors.WHITE,
+		borderWidth : moderateScale(0.8),
+		borderColor : Colors.GREY_150
+	},
+	imageContainerChildText : {
+		fontFamily : Fonts.SemiBold,
+		fontSize : moderateScale(18),
+		color : Colors.GREY_900,
+		textTransform : 'uppercase'
 	},
 	nameStyle : {
 		fontFamily : Fonts.Regular,

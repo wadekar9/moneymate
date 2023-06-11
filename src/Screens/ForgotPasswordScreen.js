@@ -1,8 +1,8 @@
 import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import { Email } from '../Assets/Images';
-import TextInputComponent from '../Component/TextInputComponent';
+import CommonContainer from '../Components/CommonContainer';
+import { EMAIL } from '../Assets/Images';
+import TextInputComponent from '../Components/TextInputComponent';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
 
 const ForgotPasswordScreen = () => {
@@ -19,7 +19,7 @@ const ForgotPasswordScreen = () => {
         }}
       >
         <Image
-          source={Email}
+          source={EMAIL}
           style={{
             width: '80%',
             height: undefined,

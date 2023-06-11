@@ -1,13 +1,17 @@
 import { ScrollView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import { BrandLogo } from '../Assets/Images/index';
+import React, { useEffect, useState } from 'react';
+import CommonContainer from '../Components/CommonContainer';
+import ScreenLoader from '../Components/ScreenLoader';
+import { BRAND_LOGO } from '../Assets/Images/index';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
 import { EmailIcon, LockIcon, EyeIcon, EyeOffIcon } from '../Assets/Icons/index';
-import { useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
+import { useDispatch, useSelector } from 'react-redux';
+import { triggerSnackMessage } from '../Services/HelperMethod';
+import { createEmailSession } from '../Redux/Actions/Authentication/CreateEmailSession';
 
-const LoginInputComponent = ({ value, icon, onChange, isPassword = false, placeholder, keyBoard = 'default' }) => {
+const LoginInputComponent = ({ value, icon, onChange, isPassword = false, placeholder, keyBoard = 'default', autoFocus = false, autoComplete }) => {
 
 	const LeftIcon = icon;
 
@@ -24,6 +28,8 @@ const LoginInputComponent = ({ value, icon, onChange, isPassword = false, placeh
 					value={value}
 					onChangeText={onChange}
 					placeholder={placeholder}
+					autoComplete={autoComplete}
+					autoFocus={autoFocus}
 					autoCapitalize={'none'}
 					autoCorrect={false}
 					placeholderTextColor={Colors.GREY_700}
@@ -50,15 +56,48 @@ const LoginInputComponent = ({ value, icon, onChange, isPassword = false, placeh
 
 const LoginScreen = () => {
 
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
+
+	const { userDetails, isUserLoggedIn, isLoading, loginDetails } = useSelector((state) => state.AuthenticationReducer);
+
 	const [details, setDetails] = useState({
 		email: '',
 		password: ''
 	})
 
+	useEffect(() => {
+		setDetails((prev) => ({ ...prev, email : loginDetails.email }))
+	},[loginDetails]);
+
+	useEffect(() => {
+		if(userDetails != null && isUserLoggedIn){
+			navigation.dispatch(StackActions.replace(StackNavigationKeys.BottomTabNavigator));
+		}
+	},[isUserLoggedIn])
+
+	const loginRequestHandler = () => {
+		if(details.email.trim().length == 0){
+			triggerSnackMessage({
+				message : 'Please enter email'
+			})
+			return;
+		}
+
+		if(details.password.trim().length < 8){
+			triggerSnackMessage({
+				message : 'Please enter password'
+			});
+			return;
+		}
+
+		dispatch(createEmailSession(details))
+	}
 
 	return (
 		<CommonContainer>
+
+			<ScreenLoader isVisiable={isLoading} />
 
 			<ScrollView
 				showsVerticalScrollIndicator={false}
@@ -69,7 +108,7 @@ const LoginScreen = () => {
 				<View style={{ flex: 1}}>
 					<View style={{ marginVertical: moderateScale(20) }}>
 						<Image
-							source={BrandLogo}
+							source={BRAND_LOGO}
 							style={{
 								width: '50%',
 								height: undefined,
@@ -92,6 +131,8 @@ const LoginScreen = () => {
 								placeholder={'Enter email'}
 								keyBoard={'email-address'}
 								icon={EmailIcon}
+								autoComplete={'email'}
+								autoFocus={true}
 							/>
 						</View>
 						<View>
@@ -99,6 +140,7 @@ const LoginScreen = () => {
 								value={details.password}
 								onChange={(e) => setDetails((prev) => ({ ...prev, password: e }))}
 								placeholder={'Enter password'}
+								autoComplete={'password'}
 								isPassword={true}
 								icon={LockIcon}
 							/>
@@ -120,6 +162,7 @@ const LoginScreen = () => {
 							style={styles.buttonContainer}
 							activeOpacity={0.8}
 							accessibilityRole={'button'}
+							onPress={() => loginRequestHandler()}
 						>
 							<Text style={styles.buttonContainerText}>Login</Text>
 						</TouchableOpacity>

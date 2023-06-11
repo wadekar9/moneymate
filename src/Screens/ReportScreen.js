@@ -1,12 +1,15 @@
 import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react';
-import CommonContainer from '../Component/CommonContainer';
+import React, { useState, useEffect } from 'react';
+import CommonContainer from '../Components/CommonContainer';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
 import { SearchIcon, MoreIcon, LeftChevronIcon, RightChevronIcon, SmallOutlineIcon, CafeIcon, TransportationIcon, HealthIcon, GiftIcon, GroceriesIcon, ElectronicsIcon, DownloadIcon } from '../Assets/Icons/index';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import dayjs from 'dayjs';
+import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import ScreenLoader from '../Components/ScreenLoader';
+import { getIncomeExpenseReport } from '../Redux/Actions/IncomeExpense/GetIncomeExpenseReport';
 
 const HeaderComponent = ({ navigation }) => {
     return (
@@ -30,9 +33,15 @@ const HeaderComponent = ({ navigation }) => {
 
 const ReportScreen = () => {
 
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+
+    const { userDetails } = useSelector((state) => state.AuthenticationReducer);
+    const { incomeExpenseReportData, incomeExpenseReportLoading } = useSelector((state) => state.IncomeExpenseReportReducer);
+
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const navigation = useNavigation();
+
     const [cartPercentage, setCartPercentage] = useState([
         { flex: 0.32, bgColor: '#B2EBF2' },
         { flex: 0.25, bgColor: '#F8BBD0' },
@@ -84,8 +93,56 @@ const ReportScreen = () => {
             numOfTransaction: 10,
             amount: 240,
             percentage: 5
+        },
+        {
+            icon: GiftIcon,
+            label: 'Gifts',
+            numOfTransaction: 18,
+            amount: 1440,
+            percentage: 12
+        },
+        {
+            icon: ElectronicsIcon,
+            label: 'Elecronics',
+            numOfTransaction: 12,
+            amount: 800,
+            percentage: 8
+        },
+        {
+            icon: CafeIcon,
+            label: 'Cafe & Bar',
+            numOfTransaction: 10,
+            amount: 240,
+            percentage: 5
+        },
+        {
+            icon: GiftIcon,
+            label: 'Gifts',
+            numOfTransaction: 18,
+            amount: 1440,
+            percentage: 12
+        },
+        {
+            icon: ElectronicsIcon,
+            label: 'Elecronics',
+            numOfTransaction: 12,
+            amount: 800,
+            percentage: 8
+        },
+        {
+            icon: CafeIcon,
+            label: 'Cafe & Bar',
+            numOfTransaction: 10,
+            amount: 240,
+            percentage: 5
         }
     ])
+
+
+    useEffect(() => {
+        // console.log('--userDetails>>>',userDetails)
+        dispatch(getIncomeExpenseReport(userDetails?.currentUserID));
+    },[]);
 
     const listContainer = ({ item }) => {
 
@@ -121,10 +178,9 @@ const ReportScreen = () => {
         >
             <HeaderComponent navigation={navigation} />
 
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                nestedScrollEnabled={true}
-            >
+            <ScreenLoader isVisiable={incomeExpenseReportLoading} />
+
+            <View style={{flex : 1}}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: moderateScale(48) }}>
                     <TouchableOpacity
                         activeOpacity={0.8}
@@ -138,7 +194,7 @@ const ReportScreen = () => {
                         onPress={() => setShowDatePicker(true)}
                     >
                         <SmallOutlineIcon />
-                        <Text style={styles.selectedDateStyle}>{dayjs(selectedDate).format('MMM YYYY')}</Text>
+                        <Text style={styles.selectedDateStyle}>{moment(selectedDate).format('MMM YYYY')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         activeOpacity={0.8}
@@ -160,13 +216,14 @@ const ReportScreen = () => {
                     </View>
                 </View>
 
-                <View style={{ marginTop: moderateScale(5) }}>
-                    <Text style={styles.overviewLabelStyle}>DETAILS</Text>
+                <View style={{ marginTop: moderateScale(5), flex : 1 }}>
+                    <Text style={{...styles.overviewLabelStyle, marginBottom : moderateScale(5)}}>DETAILS</Text>
 
-                    <View>
+                    <View style={{flex : 1}}>
                         <FlatList
                             data={listData}
                             keyExtractor={(_, index) => index.toString()}
+                            contentContainerStyle={{ paddingVertical : moderateScale(5) }}
                             showsVerticalScrollIndicator={false}
                             legacyImplementation={true}
                             maxToRenderPerBatch={10}
@@ -175,7 +232,7 @@ const ReportScreen = () => {
                         />
                     </View>
                 </View>
-            </ScrollView>
+            </View>
 
             <TouchableOpacity
                 style={styles.buttonContainer}

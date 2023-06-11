@@ -12,7 +12,7 @@ const ScreenLoader = ({ isVisiable = false }) => {
                 statusBarTranslucent={true}
             >
                 <View style={styles.container}>
-                    <ActivityIndicator size={'large'} color={Colors.WHITE} />
+                    <ActivityIndicator size={'large'} color={Colors.BLUE_500} />
                 </View>
             </Modal>
         </View>

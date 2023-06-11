@@ -1,14 +1,14 @@
 import Snackbar from 'react-native-snackbar';
-import { Fonts } from '../Config/Theme';
+import { Colors, Fonts } from '../Config/Theme';
 
-export const triggerSnackMessage = ({ bgColor = 'red', message }) => {
-    setTimeout(() => {
-      Snackbar.show({
-        text : message,
-        backgroundColor : bgColor,
-        duration : Snackbar.LENGTH_LONG,
-        fontFamily : Fonts.Medium,
-        textColor : '#ffffff'
-      })
-    }, 800);
-  }
+export const triggerSnackMessage = ({ bgColor = 'red', message, isPositive = false }) => {
+  setTimeout(() => {
+    Snackbar.show({
+      text: message,
+      backgroundColor: isPositive ? Colors.DARK_GREEN : Colors.RED_600,
+      duration: Snackbar.LENGTH_SHORT,
+      fontFamily: Fonts.SemiBold,
+      textColor: '#ffffff'
+    })
+  }, 800);
+}

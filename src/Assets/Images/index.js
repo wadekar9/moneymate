@@ -1,9 +1,9 @@
-const BrandLogo = require('./BrandLogo.png');
-const PersonImage = require('./person.jpg');
-const Email = require('./mail.png');
+const BRAND_LOGO = require('./BrandLogo.png');
+const PERSON_IMAGE = require('./person.jpg');
+const EMAIL = require('./mail.png');
 
 export {
-    BrandLogo,
-    PersonImage,
-    Email
+    BRAND_LOGO,
+    PERSON_IMAGE,
+    EMAIL
 }

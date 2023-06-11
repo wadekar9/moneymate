@@ -1,34 +1,81 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react';
-import HeaderComponent from '../Component/HeaderComponent';
-import CommonContainer from '../Component/CommonContainer';
+import HeaderComponent from '../Components/HeaderComponent';
+import CommonContainer from '../Components/CommonContainer';
+import CategoryIcon from '../Components/CategoryIcon';
 import { RightChevronIcon, LeftChevronIcon, SmallOutlineIcon, CashIcon, BankIcon, WalletIcon, CafeIcon, GroceriesIcon, ElectronicsIcon, PlusIcon } from '../Assets/Icons/index';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import dayjs from 'dayjs';
+import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetIncomeExpense } from '../Redux/Actions/IncomeExpense/GetIncomeExpense';
+
 
 const HomeScreen = () => {
 
-	const [showDatePicker, setShowDatePicker] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
 	const navigation = useNavigation();
+	const dispatch = useDispatch();
+
+	const { incomeExpenseList, incomeExpenseLoading } = useSelector((state) => state.IncomeExpenseReducer);
+	const { userDetails } = useSelector((state) => state.AuthenticationReducer);
+
+	const [showDatePicker, setShowDatePicker] = useState(false);
+	const [selectedDate, setSelectedDate] = useState(new Date());
 
 	const onChange = (event, selectedDate) => {
-        setShowDatePicker(false)
-        setSelectedDate(selectedDate);
-    };
+		setShowDatePicker(false)
+		setSelectedDate(selectedDate);
+	};
+
+	const listOfLastestIncomeExpense = () => {
+		return (
+			<View>
+				{
+					[...incomeExpenseList].map((element, index) => {
+
+						return (
+							<View key={index} style={[styles.listContainer, styles.container]}>
+								<View style={{ flex: 0.72, flexDirection: 'row', alignItems: 'center' }}>
+									<View style={{ alignItems: 'flex-start', justifyContent: 'center', flex: 0.17 }}>
+										<CategoryIcon type={element.category} />
+									</View>
+									<View style={{ flex: 0.83, paddingLeft: moderateScale(4) }}>
+										<Text style={styles.listTitleName}>{element.description}</Text>
+										<Text style={styles.listCategoryName}>{element.category}</Text>
+									</View>
+								</View>
+								<View style={{ flex: 0.28, justifyContent: 'space-around', alignItems: 'flex-end' }}>
+									<Text style={[styles.listAmountStyle, { color: (element.type == 'income') ? Colors.GREEN_600 : Colors.RED_600 }]}>{(element.type == 'income') ? '+' : '-'}&nbsp;{Number(element.amount).toLocaleString('en', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 })}</Text>
+									<Text style={{ ...styles.listContainerLabelAndAmount, textAlign: 'right' }}>{moment(element.date_time).fromNow(true)}</Text>
+								</View>
+							</View>
+						)
+					})
+				}
+			</View>
+		)
+	}
 
 	return (
 		<CommonContainer
-			customStyles={{paddingHorizontal : moderateScale(10)}}
+			customStyles={{ paddingHorizontal: moderateScale(10) }}
 		>
 			<HeaderComponent />
 
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				alwaysBounceVertical={false}
+				contentContainerStyle={{
+					flexGrow: 1
+				}}
+				refreshControl={
+					<RefreshControl
+						refreshing={incomeExpenseLoading}
+						onRefresh={() => dispatch(GetIncomeExpense(userDetails.currentUserID))}
+					/>
+				}
 			>
 				<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: moderateScale(48) }}>
 					<TouchableOpacity
@@ -44,7 +91,7 @@ const HomeScreen = () => {
 						onPress={() => setShowDatePicker(true)}
 					>
 						<SmallOutlineIcon />
-						<Text style={styles.selectedDateStyle}>{dayjs(selectedDate).format('MMM YYYY')}</Text>
+						<Text style={styles.selectedDateStyle}>{moment(selectedDate).format('MMM YYYY')}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						activeOpacity={0.8}
@@ -54,7 +101,7 @@ const HomeScreen = () => {
 					</TouchableOpacity>
 				</View>
 
-				<View style={{ ...styles.container, flexDirection: 'row', height: moderateScale(94) }}>
+				<View style={{ ...styles.container, flexDirection: 'row', height: moderateScale(94), marginVertical: moderateScale(8) }}>
 					<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 						<CashIcon />
 						<View style={{ marginTop: moderateScale(2), alignItems: 'center', justifyContent: 'center' }}>
@@ -78,92 +125,7 @@ const HomeScreen = () => {
 					</View>
 				</View>
 
-				<View style={{ ...styles.container, paddingVertical: moderateScale(10), paddingHorizontal: moderateScale(10) }}>
-					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: moderateScale(32) }}>
-						<Text style={styles.listContainerLabelAndAmount}>Today</Text>
-						<Text style={styles.listContainerLabelAndAmount}>-1,234</Text>
-					</View>
-					<View>
-						{
-							(new Array(3)).fill('_').map((_, index) => {
-								return (
-									<View key={index} style={styles.listChildContainer}>
-										<View style={{ flex: 0.82, flexDirection: 'row', alignItems: 'center' }}>
-											<View style={{ alignItems: 'flex-start', justifyContent: 'center', flex: 0.17 }}>
-												<CafeIcon />
-											</View>
-											<View style={{ flex: 0.83 }}>
-												<Text style={styles.listTitleName}>Egg and Vegies</Text>
-												<Text style={styles.listCategoryName}>Bar & Cafe</Text>
-											</View>
-										</View>
-										<View style={{ flex: 0.18, alignSelf: 'center', alignItems: 'flex-end' }}>
-											<Text style={styles.listAmountStyle}>-300$</Text>
-										</View>
-									</View>
-								)
-							})
-						}
-					</View>
-				</View>
-
-				<View style={{ ...styles.container, paddingVertical: moderateScale(10), paddingHorizontal: moderateScale(10) }}>
-					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: moderateScale(32) }}>
-						<Text style={styles.listContainerLabelAndAmount}>Today</Text>
-						<Text style={styles.listContainerLabelAndAmount}>-1,234</Text>
-					</View>
-					<View>
-						{
-							(new Array(3)).fill('_').map((_, index) => {
-								return (
-									<View key={index} style={styles.listChildContainer}>
-										<View style={{ flex: 0.82, flexDirection: 'row', alignItems: 'center' }}>
-											<View style={{ alignItems: 'flex-start', justifyContent: 'center', flex: 0.17 }}>
-												<GroceriesIcon />
-											</View>
-											<View style={{ flex: 0.83 }}>
-												<Text style={styles.listTitleName}>Egg and Vegies</Text>
-												<Text style={styles.listCategoryName}>Bar & Cafe</Text>
-											</View>
-										</View>
-										<View style={{ flex: 0.18, alignSelf: 'center', alignItems: 'flex-end' }}>
-											<Text style={styles.listAmountStyle}>-300$</Text>
-										</View>
-									</View>
-								)
-							})
-						}
-					</View>
-				</View>
-
-				<View style={{ ...styles.container, paddingVertical: moderateScale(10), paddingHorizontal: moderateScale(10) }}>
-					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: moderateScale(32) }}>
-						<Text style={styles.listContainerLabelAndAmount}>Today</Text>
-						<Text style={styles.listContainerLabelAndAmount}>-1,234</Text>
-					</View>
-					<View>
-						{
-							(new Array(3)).fill('_').map((_, index) => {
-								return (
-									<View key={index} style={styles.listChildContainer}>
-										<View style={{ flex: 0.82, flexDirection: 'row', alignItems: 'center' }}>
-											<View style={{ alignItems: 'flex-start', justifyContent: 'center', flex: 0.17 }}>
-												<ElectronicsIcon />
-											</View>
-											<View style={{ flex: 0.83 }}>
-												<Text style={styles.listTitleName}>Egg and Vegies</Text>
-												<Text style={styles.listCategoryName}>Bar & Cafe</Text>
-											</View>
-										</View>
-										<View style={{ flex: 0.18, alignSelf: 'center', alignItems: 'flex-end' }}>
-											<Text style={styles.listAmountStyle}>-300$</Text>
-										</View>
-									</View>
-								)
-							})
-						}
-					</View>
-				</View>
+				{listOfLastestIncomeExpense()}
 			</ScrollView>
 
 			<TouchableOpacity
@@ -177,16 +139,16 @@ const HomeScreen = () => {
 			</TouchableOpacity>
 
 			{
-                showDatePicker &&
-                <DateTimePicker
-                    testID="dateTimePicker"
-                    value={selectedDate}
-                    maximumDate={new Date()}
-                    mode={'date'}
-                    is24Hour={true}
-                    onChange={onChange}
-                />
-            }
+				showDatePicker &&
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={selectedDate}
+					maximumDate={new Date()}
+					mode={'date'}
+					is24Hour={true}
+					onChange={onChange}
+				/>
+			}
 		</CommonContainer>
 	)
 }
@@ -212,10 +174,10 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		width: '100%',
+		height: moderateScale(65),
 		borderWidth: moderateScale(1),
 		borderColor: '#E0E0E0',
-		borderRadius: moderateScale(8),
-		marginVertical: moderateScale(8)
+		borderRadius: moderateScale(8)
 	},
 	labelStyle: {
 		fontFamily: Fonts.Regular,
@@ -233,16 +195,18 @@ const styles = StyleSheet.create({
 		fontSize: moderateScale(10),
 		color: Colors.GREY_800,
 		textTransform: 'uppercase',
-		letterSpacing: 1.3
+		letterSpacing: 1.1
 	},
-	listChildContainer: {
+	listContainer: {
 		flexDirection: 'row',
-		alignItems: 'center',
-		height: moderateScale(56)
+		alignItems: 'stretch',
+		overflow: 'hidden',
+		padding: moderateScale(8),
+		marginVertical: moderateScale(5)
 	},
 	listAmountStyle: {
 		fontFamily: Fonts.Regular,
-		fontSize: moderateScale(14),
+		fontSize: moderateScale(18),
 		color: Colors.RED_600
 	},
 	listTitleName: {
@@ -257,24 +221,24 @@ const styles = StyleSheet.create({
 		color: Colors.GREY_700,
 		textTransform: 'capitalize'
 	},
-	buttonContainer : {
-		position : 'absolute',
-		alignSelf : 'center',
-		alignItems : 'center',
-		justifyContent : 'center',
-		flexDirection : 'row',
-		backgroundColor : Colors.BLUE_500,
-		height : moderateScale(48),
-		width : '38%',
-		borderRadius : moderateScale(44),
-		bottom : moderateScale(22),
-		elevation : 3,
-		shadowColor : Colors.BLACK
+	buttonContainer: {
+		position: 'absolute',
+		alignSelf: 'center',
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexDirection: 'row',
+		backgroundColor: Colors.BLUE_500,
+		height: moderateScale(48),
+		width: '38%',
+		borderRadius: moderateScale(44),
+		bottom: moderateScale(22),
+		elevation: 3,
+		shadowColor: Colors.BLACK
 	},
-	buttonContainerText : {
-		fontFamily : Fonts.Medium,
-		fontSize : moderateScale(14),
-		color : Colors.WHITE,
-		marginLeft : moderateScale(8)
+	buttonContainerText: {
+		fontFamily: Fonts.Medium,
+		fontSize: moderateScale(14),
+		color: Colors.WHITE,
+		marginLeft: moderateScale(8)
 	}
 })

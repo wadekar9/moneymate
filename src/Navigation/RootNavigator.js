@@ -10,7 +10,7 @@ const RootNavigator = () => {
   return (
     <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={StackNavigationKeys.Login}
+          initialRouteName={StackNavigationKeys.Splash}
           screenOptions={{
             headerShown : false,
             animation : 'slide_from_right',

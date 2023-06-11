@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react';
-import CommonContainer from '../Component/CommonContainer';
-import CommonHeader from '../Component/CommonHeader';
+import CommonContainer from '../Components/CommonContainer';
+import CommonHeader from '../Components/CommonHeader';
 import { BankIcon, CafeIcon, GroceriesIcon, SavingsIcon, TransportationIcon } from '../Assets/Icons/index';
 import { Colors, Fonts, moderateScale } from '../Config/Theme';
 import { CommonActions, useNavigation } from '@react-navigation/native';

@@ -36,7 +36,7 @@ const TextInputComponent = ({
                         value={value}
                         onChangeText={(e) => onChange(e)}
                         keyboardType={keyboard}
-                        onSubmitEditing={() => onSubmit()}
+                        onSubmitEditing={() => onSubmit && onSubmit()}
                         maxLength={maxLength}
                         multiline={multiline}
                         placeholder={placeholder}
