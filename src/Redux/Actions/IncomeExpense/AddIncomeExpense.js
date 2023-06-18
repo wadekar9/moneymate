@@ -1,16 +1,19 @@
 import { triggerSnackMessage } from "../../../Services/HelperMethod";
 import { startAddIncomeExpenseLoading, stopAddIncomeExpenseLoading, storeIncomeExpenseDetails } from "../ActionCreators";
 import Config from "react-native-config";
-import { APP_WRITE_DATABASE, APP_WRITE_UNIQUE_ID } from "../../../Config/AppWriteConfig";
+import { APP_WRITE_DATABASE } from "../../../Config/AppWriteConfig";
 import { Messages } from "../../../Config/Constant";
+import { ID } from "appwrite";
 
 export const AddIncomeExpense = (incomeExpenseData,callback) => {
+
+    const UNIQUE_DOC_ID = ID.unique();
 
     return async (dispatch) => {
 
         dispatch(startAddIncomeExpenseLoading());
 
-        const addIncomeExpensePromise = APP_WRITE_DATABASE.createDocument(Config.APP_WRITE_DATABASE_ID,Config.APP_WRITE_INCOME_EXPENSE_COLLECTION_ID,APP_WRITE_UNIQUE_ID,incomeExpenseData)
+        const addIncomeExpensePromise = APP_WRITE_DATABASE.createDocument(Config.APP_WRITE_DATABASE_ID,Config.APP_WRITE_INCOME_EXPENSE_COLLECTION_ID,UNIQUE_DOC_ID,incomeExpenseData)
 
         addIncomeExpensePromise.then(
             (response) => {

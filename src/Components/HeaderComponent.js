@@ -17,7 +17,7 @@ const HeaderComponent = () => {
                 accessibilityRole={'tab'}
                 style={styles.profileContainer}
             >
-                <Text style={styles.profileContainerChildText}>{userDetails?.userName?.charAt(0)}</Text>
+                <Text style={styles.profileContainerChildText}>{userDetails?.name?.charAt(0)}</Text>
             </View>
             <View style={{ flex: 1, alignItems: 'flex-end' }}>
                 <TouchableOpacity

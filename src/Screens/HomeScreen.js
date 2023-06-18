@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import React, { useState } from 'react';
 import HeaderComponent from '../Components/HeaderComponent';
 import CommonContainer from '../Components/CommonContainer';
@@ -11,6 +11,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetIncomeExpense } from '../Redux/Actions/IncomeExpense/GetIncomeExpense';
+import { EMPTY } from '../Assets/Images/index';
 
 
 const HomeScreen = () => {
@@ -30,6 +31,24 @@ const HomeScreen = () => {
 	};
 
 	const listOfLastestIncomeExpense = () => {
+
+		if(incomeExpenseList.length == 0){
+			return(
+				<View style={{flex : 1,alignItems:'center',justifyContent:'center'}}>
+					<Image
+						source={EMPTY}
+						style={{
+							width : '50%',
+							height : '50%',
+							aspectRatio : 1
+						}}
+						resizeMode={'contain'}
+					/>
+					<Text style={styles.emptyLabelStyle}>History not available</Text>
+				</View>
+			)
+		}
+
 		return (
 			<View>
 				{
@@ -73,7 +92,7 @@ const HomeScreen = () => {
 				refreshControl={
 					<RefreshControl
 						refreshing={incomeExpenseLoading}
-						onRefresh={() => dispatch(GetIncomeExpense(userDetails.currentUserID))}
+						onRefresh={() => dispatch(GetIncomeExpense(userDetails.user_id))}
 					/>
 				}
 			>
@@ -240,5 +259,10 @@ const styles = StyleSheet.create({
 		fontSize: moderateScale(14),
 		color: Colors.WHITE,
 		marginLeft: moderateScale(8)
+	},
+	emptyLabelStyle : {
+		fontFamily : Fonts.Bold,
+		fontSize : moderateScale(18),
+		color : Colors.GREY_600
 	}
 })

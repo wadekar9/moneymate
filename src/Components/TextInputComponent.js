@@ -14,7 +14,8 @@ const TextInputComponent = ({
     maxLength = undefined,
     isRequired = false,
     multiline = false,
-    isPassword = false
+    isPassword = false,
+    editable = true
 }) => {
 
     const [focused, setFocused] = useState(false);
@@ -39,6 +40,7 @@ const TextInputComponent = ({
                         onSubmitEditing={() => onSubmit && onSubmit()}
                         maxLength={maxLength}
                         multiline={multiline}
+                        editable={editable}
                         placeholder={placeholder}
                         placeholderTextColor={Colors.GREY_700}
                         autoCapitalize={'none'}

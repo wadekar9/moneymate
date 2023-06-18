@@ -1,4 +1,4 @@
-import { APP_WRITE_ACCOUNT, APP_WRITE_UNIQUE_ID } from "../../../Config/AppWriteConfig";
+import { APP_WRITE_ACCOUNT } from "../../../Config/AppWriteConfig";
 import { Messages } from "../../../Config/Constant";
 import { triggerSnackMessage } from "../../../Services/HelperMethod";
 import { storeUserDetails, stopAuthenticationLoading } from "../ActionCreators";
@@ -35,12 +35,13 @@ export const getCurrentAccount = (callback) => {
     return async (dispatch) => {
         const currentAccountPromise = APP_WRITE_ACCOUNT.get();
 
-        currentAccountPromise.then(
+        await currentAccountPromise.then(
             (response) => {
+                // console.log("resposne",response)
                 dispatch(getSessionsList(response));
             },
             (error) => {
-                console.log("-------->", error);
+                // console.log("-------->", error);
                 dispatch(stopAuthenticationLoading());
                 (callback) ?
                     callback()
@@ -60,22 +61,26 @@ export const getSessionsList = (user) => {
     return async (dispatch) => {
         const sessionListPromise = APP_WRITE_ACCOUNT.listSessions();
 
+        // console.log("sessiionn---->",email, emailVerification, name)
+
         sessionListPromise.then(
             (response) => {
 
                 if (response.sessions.length) {
                     const { $id, userId } = response.sessions[0];
 
+                    global.USER_ID = userId;
+                    global.SESSION_ID = $id; 
+
                     const userDetails = {
                         currentSessionID: $id,
-                        currentUserID: userId,
+                        user_id: userId,
                         email,
                         emailVerification,
-                        userName: name
+                        name: name
                     }
 
                     dispatch(checkUserDocument(userDetails))
-                    dispatch(storeUserDetails(userDetails));
                 }
             },
             (error) => {

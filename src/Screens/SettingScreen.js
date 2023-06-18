@@ -30,12 +30,12 @@ const SettingScreen = () => {
 			isLogOut : false,
 			onPressEvent : () => navigation.navigate(StackNavigationKeys.ManageCategory)
 		},
-		{
-			icon : PDFIcon,
-			label : 'Export to PDF',
-			isLogOut : false,
-			onPressEvent : () => console.log('LLLLL')
-		},
+		// {
+		// 	icon : PDFIcon,
+		// 	label : 'Export to PDF',
+		// 	isLogOut : false,
+		// 	onPressEvent : () => console.log('LLLLL')
+		// },
 		{
 			icon : DollerIcon,
 			label : 'Choose currency',
@@ -110,10 +110,10 @@ const SettingScreen = () => {
 								alt={'Profile Image'}
 								resizeMode={'cover'}
 							/> */}
-							<Text style={styles.imageContainerChildText}>{userDetails?.userName?.charAt(0)}</Text>
+							<Text style={styles.imageContainerChildText}>{userDetails?.name?.charAt(0)}</Text>
 						</View>
 						<View style={{marginLeft : moderateScale(15),flex : 1}}>
-							<Text style={styles.nameStyle}>{userDetails.userName}</Text>
+							<Text style={styles.nameStyle}>{userDetails.name}</Text>
 							<Text style={styles.emailStyle}>{userDetails.email}</Text>
 						</View>
 					</View>

@@ -1,59 +1,57 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react';
+import React, { useEffect } from 'react';
 import CommonContainer from '../Components/CommonContainer';
 import CommonHeader from '../Components/CommonHeader';
-import { BankIcon, CafeIcon, GroceriesIcon, SavingsIcon, TransportationIcon } from '../Assets/Icons/index';
+import { DeleteOutlineIcon } from '../Assets/Icons/index';
 import { Colors, Fonts, moderateScale } from '../Config/Theme';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { StackNavigationKeys } from '../Navigation/NavigationKeys';
-
-const dummyCategoryData = [
-  {
-    label: 'Bank',
-    icon: BankIcon
-  },
-  {
-    label: 'Cafe & Bar',
-    icon: CafeIcon
-  },
-  {
-    label: 'Grocery',
-    icon: GroceriesIcon
-  },
-  {
-    label: 'Salary',
-    icon: SavingsIcon
-  },
-  {
-    label: 'Transport',
-    icon: TransportationIcon
-  }
-];
+import { getUserCategories } from '../Redux/Actions/Category/GetUserCategories';
+import { useDispatch, useSelector } from 'react-redux';
+import ScreenLoader from '../Components/ScreenLoader';
+import CategoryIcon from '../Components/CategoryIcon';
+import { triggerAlertMessage } from '../Services/HelperMethod';
+import { updateUserCategories } from '../Redux/Actions/Category/UpdateUserCategories';
 
 const ManageCategoryScreen = () => {
 
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+
+  const { userDetails } = useSelector((state) => state.AuthenticationReducer);
+  const { manageCategories, manageCategoriesDOC_ID, addCategoryLoading, manageCategoryLoading } = useSelector((state) => state.CategoryReducer);
+
+  useEffect(() => {
+    if(manageCategories.length == 0) getUserCategory();
+  },[]);
+
+  const getUserCategory = () => dispatch(getUserCategories(userDetails?.user_id));
+
+  const handleDeleteCategory = (item) => {
+
+    const newCategories = manageCategories.filter((ele) => ele != item);
+
+    triggerAlertMessage(`Are you sure to delete ${item} category ?`,'Delete',() => { dispatch(updateUserCategories({ categories : newCategories }, manageCategoriesDOC_ID, () => { getUserCategory() }, true)) })
+  }
 
   const listContainer = ({ item }) => {
 
-    const CategoryIcon = item.icon
-
     return (
       <View style={styles.listContainerStyle}>
-        <View style={{ flex: 0.8, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 0.85, flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flex: 0.2, alignItems: 'center', justifyContent: 'center' }}>
-            <CategoryIcon />
+            <CategoryIcon type={item} />
           </View>
           <View style={{ flex: 0.8 }}>
-            <Text style={styles.categoryNameStyle}>{item.label}</Text>
+            <Text style={styles.categoryNameStyle}>{item}</Text>
           </View>
         </View>
-        <View style={{ flex: 0.2, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ flex: 0.15, alignItems: 'center', justifyContent: 'center' }}>
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => navigation.dispatch(CommonActions.navigate(StackNavigationKeys.AddCategory))}
+            onPress={() => handleDeleteCategory(item)}
           >
-            <Text style={styles.editButtonStyle}>Edit</Text>
+            <DeleteOutlineIcon/>
           </TouchableOpacity>
         </View>
       </View>
@@ -64,9 +62,11 @@ const ManageCategoryScreen = () => {
     <CommonContainer>
       <CommonHeader headerLabel={'Manage categories'} />
 
+      <ScreenLoader isVisiable={manageCategoryLoading || addCategoryLoading} />
+
       <View style={{ flex: 1 }}>
         <FlatList
-          data={dummyCategoryData}
+          data={manageCategories}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={{
             paddingVertical: moderateScale(10),
@@ -75,6 +75,8 @@ const ManageCategoryScreen = () => {
           ItemSeparatorComponent={() => <View style={{ margin: moderateScale(5) }} />}
           showsVerticalScrollIndicator={false}
           renderItem={listContainer}
+          refreshing={false}
+          onRefresh={() => getUserCategory()}
         />
 
         <TouchableOpacity
@@ -101,12 +103,13 @@ const styles = StyleSheet.create({
   editButtonStyle: {
     fontFamily: Fonts.Medium,
     fontSize: moderateScale(14),
-    color: Colors.BLUE_500
+    color: Colors.RED_600
   },
   categoryNameStyle: {
     fontFamily: Fonts.Regular,
     fontSize: moderateScale(14),
-    color: Colors.BLACK
+    color: Colors.BLACK,
+    textTransform : 'capitalize'
   },
   buttonContainer: {
     position: 'absolute',

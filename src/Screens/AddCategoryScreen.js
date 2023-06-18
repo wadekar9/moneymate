@@ -8,20 +8,34 @@ import { PlusCircleIcon, GroceriesIcon } from '../Assets/Icons/index';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { triggerSnackMessage } from '../Services/HelperMethod';
 import ScreenLoader from '../Components/ScreenLoader';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { CommonCategoriesData } from '../Utils/Data';
+import CategoryIcon from '../Components/CategoryIcon';
+import { updateUserCategories } from '../Redux/Actions/Category/UpdateUserCategories';
+import { useNavigation } from '@react-navigation/native';
 
 const AddCategoryScreen = () => {
 
-	const { } = useSelector((state) => state)
+	const { manageCategories, manageCategoriesDOC_ID, addCategoryLoading } = useSelector((state) => state.CategoryReducer);
+
+	const dispatch = useDispatch();
+	const navigation = useNavigation();
 	const bottomSheetRef = useRef(null);
 
-	const [categoryIcon, setCategoryIcon] = useState(null);
-	const [categoryName, setCategoryName] = useState('Demo Grocery Category');
+	const [categoryDetails, setCategoryDetails] = useState({
+		iconSelected : false,
+		categoryName : 'Select category type',
+		canModify : false
+	});
+
+	const handleAddCategory = () => {
+		dispatch(updateUserCategories({ categories : [...manageCategories, categoryDetails.categoryName] }, manageCategoriesDOC_ID, () => { navigation.goBack() }))
+	}
 
 	return (
 		<CommonContainer>
 
-			<ScreenLoader isVisiable={false} />
+			<ScreenLoader isVisiable={addCategoryLoading} />
 
 			<CommonHeader headerLabel={'Add new category'} />
 
@@ -41,14 +55,15 @@ const AddCategoryScreen = () => {
 							accessibilityRole={'button'}
 							onPress={() => bottomSheetRef.current.open()}
 						>
-							<PlusCircleIcon />
+							{ (categoryDetails.iconSelected) ?  <CategoryIcon type={categoryDetails.categoryName} /> : <PlusCircleIcon /> }
 						</TouchableOpacity>
 
 						<View>
 							<TextInputComponent
 								label={'Category Name'}
-								value={categoryName}
-								onChange={setCategoryName}
+								editable={false}
+								value={categoryDetails.categoryName}
+								onChange={(e) => setCategoryDetails((prev) => ({ ...prev, categoryName : e }))}
 								placeholder={"Enter cateory name"}
 							/>
 						</View>
@@ -57,13 +72,11 @@ const AddCategoryScreen = () => {
 					<TouchableOpacity
 						activeOpacity={0.8}
 						accessibilityRole={'button'}
-						style={styles.buttonContainer}
-						onPress={() => triggerSnackMessage({
-							bgColor : Colors.DARK_GREEN,
-							message : 'New category added successfully.'
-						})}
+						disabled={!categoryDetails.iconSelected}
+						style={[styles.buttonContainer, { opacity : categoryDetails.iconSelected ? 1 : 0.6 }]}
+						onPress={() => handleAddCategory()}
 					>
-						<Text style={styles.buttonContainerText}>Add New Category</Text>
+						<Text style={styles.buttonContainerText}>Add new category</Text>
 					</TouchableOpacity>
 				</ScrollView>
 			</View>
@@ -101,14 +114,27 @@ const AddCategoryScreen = () => {
 						contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}
 					>
 						{
-							(new Array(15).fill('_').map((_, index) => {
+							([...CommonCategoriesData].map((ele, index) => {
+								
+								let Icon = ele.icon
+								let isIncluded = manageCategories.includes(ele.label)
+
 								return (
-									<View key={index} style={[styles.modalChildContainer, { borderColor: Colors.GREY_200 }]}>
+									<View key={index} style={[styles.modalChildContainer, { opacity : isIncluded ? 0.4 : 1 }]}>
 										<TouchableOpacity
 											activeOpacity={0.8}
-											onPress={() => console.log('kkkk')}
+											disabled={isIncluded}
+											onPress={() => {
+												setCategoryDetails((prev) => ({
+													...prev,
+													categoryName : ele.label,
+													canModify : ele.canModify,
+													iconSelected : true
+												}))
+												bottomSheetRef.current?.close();
+											}}
 										>
-											<GroceriesIcon />
+											<Icon />
 										</TouchableOpacity>
 									</View>
 								)
@@ -148,8 +174,7 @@ const styles = StyleSheet.create({
 	buttonContainerText: {
 		fontFamily: Fonts.Medium,
 		fontSize: moderateScale(15),
-		color: Colors.WHITE,
-		textTransform: 'capitalize'
+		color: Colors.WHITE
 	},
 	bottomHeader: {
 		fontFamily: Fonts.Medium,

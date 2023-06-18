@@ -1,5 +1,7 @@
 import Snackbar from 'react-native-snackbar';
 import { Colors, Fonts } from '../Config/Theme';
+import { Alert } from 'react-native';
+import { Constant } from '../Config/Constant';
 
 export const triggerSnackMessage = ({ bgColor = 'red', message, isPositive = false }) => {
   setTimeout(() => {
@@ -11,4 +13,24 @@ export const triggerSnackMessage = ({ bgColor = 'red', message, isPositive = fal
       textColor: '#ffffff'
     })
   }, 800);
+}
+
+
+export const triggerAlertMessage = (message = '',label1 = 'Ok', callback) => {
+  Alert.alert(
+    Constant.APP_NAME,
+    message,
+    [
+      {
+        text : 'Cancel',
+        style : 'cancel',
+        onPress : () => null
+      },
+      {
+        text : label1,
+        style : 'default',
+        onPress : () => callback()
+      }
+    ]
+  )
 }

@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CommonContainer from '../Components/CommonContainer';
 import CommonHeader from '../Components/CommonHeader';
 import { moderateScale, Colors, Fonts } from '../Config/Theme';
@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import ScreenLoader from '../Components/ScreenLoader';
 import { triggerSnackMessage } from '../Services/HelperMethod';
 import { AddIncomeExpense } from '../Redux/Actions/IncomeExpense/AddIncomeExpense';
+import { getUserCategories } from '../Redux/Actions/Category/GetUserCategories';
+import CategoryIcon from '../Components/CategoryIcon';
 
 const DropdownData = [
 	{ label: 'Income', value: 'income' },
@@ -27,6 +29,7 @@ const AddIncomeExpenseScreen = () => {
 
 	const { addIncomeExpenseLoading } = useSelector((state) => state.IncomeExpenseReducer);
 	const { userDetails } = useSelector((state) => state.AuthenticationReducer);
+	const { manageCategories } = useSelector((state) => state.CategoryReducer);
 
 	const [selectedType, setSelectedType] = useState('income');
 	const [details, setDetails] = useState({
@@ -36,8 +39,14 @@ const AddIncomeExpenseScreen = () => {
 		description: ''
 	});
 
+	useEffect(() => {
+		getUserCategory();
+	},[]);
+
+	const getUserCategory = () => dispatch(getUserCategories(userDetails?.user_id));
+
 	const handleAddIncomeExpense = () => {
-		if(details.selectedCategory == '00000'){
+		if(details.selectedCategory == null){
 			triggerSnackMessage({
 				message : 'Please select category'
 			});
@@ -53,11 +62,11 @@ const AddIncomeExpenseScreen = () => {
 
 		const incomeExpenseObject = {
 			type : selectedType,
-			category : 'grocery',
+			category : details.categoryName,
 			amount : details.amount.trim(),
 			description : details.description.trim(),
 			date_time : new Date(),
-			user_id : userDetails.currentUserID
+			user_id : userDetails.user_id
 		}
 
 		dispatch(
@@ -191,13 +200,21 @@ const AddIncomeExpenseScreen = () => {
 						contentContainerStyle={{paddingHorizontal : moderateScale(5),marginTop : moderateScale(12)}}
 					>
 						{
-							(new Array(15).fill('_').map((_, index) => {
+							([...manageCategories].map((item, index) => {
 								return (
-									<View key={index} style={styles.modalChildContainer}>
-										<GroceriesIcon />
+									<TouchableOpacity
+										key={index}
+										activeOpacity={0.75}
+										onPress={() => {
+											bottomSheetRef.current.close();
+											setDetails((prev) => ({ ...prev, categoryName : item, selectedCategory : item }))
+										}}
+										style={styles.modalChildContainer}
+									>
+										<CategoryIcon type={item} />
 
-										<Text style={styles.groceryName}>Grocery</Text>
-									</View>
+										<Text style={styles.groceryName}>{item}</Text>
+									</TouchableOpacity>
 								)
 							}))
 						}
@@ -252,7 +269,9 @@ const styles = StyleSheet.create({
 	containerTextStyle: {
 		fontFamily: Fonts.Regular,
 		fontSize: moderateScale(15),
-		color: Colors.GREY_900
+		color: Colors.GREY_900,
+		textTransform : 'capitalize',
+		textAlign : 'left'
 	},
 	bottomHeader: {
 		fontFamily: Fonts.Medium,
@@ -287,8 +306,10 @@ const styles = StyleSheet.create({
 	},
 	groceryName : {
 		fontFamily : Fonts.Regular,
-		fontSize : moderateScale(12),
-		color : Colors.GREY_800
+		fontSize : moderateScale(13),
+		color : Colors.GREY_800,
+		textTransform : 'capitalize',
+		textAlign : 'center'
 	},
 	bottomSheetButtonContainer : {
 		width : '70%',

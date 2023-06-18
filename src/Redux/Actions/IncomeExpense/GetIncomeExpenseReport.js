@@ -8,7 +8,7 @@ import { Messages } from "../../../Config/Constant";
 export const getIncomeExpenseReport = (user_id) => {
     return async (dispatch) => {
 
-        let QueryList = [APP_WRITE_QUERY.equal('user_id',[user_id]),APP_WRITE_QUERY.select(['category','amount','date_time','description','type'])];
+        let QueryList = [APP_WRITE_QUERY.equal('user_id',[user_id])];
 
         dispatch(startIncomeExpenseReportLoading());
 
@@ -16,8 +16,6 @@ export const getIncomeExpenseReport = (user_id) => {
 
         incomeExpenseReportPromise.then(
             (response) => {
-
-                console.log(response.documents);
 
                 let categoryWiseData = [];
                 
@@ -28,14 +26,24 @@ export const getIncomeExpenseReport = (user_id) => {
                     let checked = categoryWiseData.findIndex((ele) => ele?.category == element?.category);
 
                     if(checked === -1){
-                        categoryWiseData.push()
+                        categoryWiseData.push({
+                            noOfTxn : 1,
+                            amount : element?.amount,
+                            type : element.type,
+                            category : element.category,
+                            total_length : data.length,
+                            percentage : ((1/data.length) * 100).toFixed(0)
+                        })
                     } else {
                         categoryWiseData[checked].amount = categoryWiseData[checked].amount + element?.amount;
-                        categoryWiseData[checked].noOfTxn = categoryWiseData[checked].amount + 1;
+                        categoryWiseData[checked].percentage = ((categoryWiseData[checked].noOfTxn + 1)/data.length * 100).toFixed(0)
+                        categoryWiseData[checked].noOfTxn = categoryWiseData[checked].noOfTxn + 1;
                     }
 
-                })
 
+                });
+
+                dispatch(storeIncomeExpenseReportData(categoryWiseData))
                 dispatch(stopIncomeExpenseReportLoading());
             },
             (error) => {

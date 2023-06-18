@@ -13,6 +13,7 @@ export const createEmailSession = ({ email, password }) => {
 
         emailSessionCreationPromise.then(
             (response) => {
+                // console.log(response)
                 dispatch(getCurrentAccount());
                 triggerSnackMessage({
                     isPositive: true,

@@ -2,14 +2,20 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import React, { useState } from 'react';
 import CommonContainer from '../Components/CommonContainer';
 import CommonHeader from '../Components/CommonHeader';
+import ScreenLoader from '../Components/ScreenLoader';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { triggerAlertMessage } from '../Services/HelperMethod';
+import { updateUserDocument } from '../Redux/Actions/Authentication/UpdateUserDocument';
 
 const CurrencyScreen = () => {
 
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
+	const { userDetails, isUpdateLoading } = useSelector((state) => state.AuthenticationReducer);
 
-	const [selectedCurrency, setSelectedCurrency] = useState(null)
+	const [selectedCurrency, setSelectedCurrency] = useState(userDetails?.currency)
 	const [currencyData, setCurrencyData] = useState([
 		{
 			currenctName: 'USD',
@@ -38,8 +44,8 @@ const CurrencyScreen = () => {
 		return (
 			<TouchableOpacity
 				activeOpacity={0.8}
-				onPress={() => setSelectedCurrency(item)}
-				style={[styles.itemContainer, selectedCurrency && selectedCurrency.currenctSymbol == (item.currenctSymbol) && { ...styles.itemSelectionStyle }]}
+				onPress={() => setSelectedCurrency(item.currenctName)}
+				style={[styles.itemContainer, selectedCurrency === (item.currenctName) && { ...styles.itemSelectionStyle }]}
 			>
 				<Text style={styles.itemContainerText}>{item.currenctSymbol}</Text>
 				<Text style={[styles.itemContainerText, { marginLeft: moderateScale(8) }]}>{item.currenctName}</Text>
@@ -47,9 +53,17 @@ const CurrencyScreen = () => {
 		)
 	}
 
+	const updateCurrencyHandler = () => {
+
+		let msg = 'Are you sure to update your currency ?';
+		triggerAlertMessage(msg, "Update", () => { dispatch(updateUserDocument({ currency: selectedCurrency }, userDetails.$id, () => { navigation.goBack() })) });
+	}
+
 	return (
 		<CommonContainer>
 			<CommonHeader headerLabel={'Choose Currency'} />
+
+			<ScreenLoader isVisiable={isUpdateLoading} />
 
 			<View style={{ flex: 1 }}>
 				<FlatList
@@ -66,11 +80,11 @@ const CurrencyScreen = () => {
 				/>
 
 				<TouchableOpacity
-					style={[styles.buttonContainer, { opacity : selectedCurrency ? 1 : 0.6 }]}
-					disabled={selectedCurrency === null}
+					style={[styles.buttonContainer, { opacity: selectedCurrency !== userDetails.currency ? 1 : 0.6 }]}
+					disabled={selectedCurrency === null || selectedCurrency === userDetails.currency}
 					activeOpacity={0.9}
 					accessibilityRole={'button'}
-					onPress={() => navigation.goBack()}
+					onPress={() => updateCurrencyHandler()}
 				>
 					<Text style={styles.buttonContainerText}>Update Currency</Text>
 				</TouchableOpacity>
@@ -119,10 +133,10 @@ const styles = StyleSheet.create({
 		bottom: moderateScale(22),
 		elevation: 1.2,
 		shadowColor: Colors.BLACK
-	  },
-	  buttonContainerText: {
+	},
+	buttonContainerText: {
 		fontFamily: Fonts.Medium,
 		fontSize: moderateScale(14),
 		color: Colors.WHITE
-	  }
+	}
 })

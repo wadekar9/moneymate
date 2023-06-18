@@ -7,5 +7,4 @@ APP_WRITE_CLIENT.setEndpoint(Config.API_ENDPOINT).setProject(Config.APP_WRITE_PR
 
 export const APP_WRITE_ACCOUNT = new Account(APP_WRITE_CLIENT);
 export const APP_WRITE_DATABASE = new Databases(APP_WRITE_CLIENT);
-export const APP_WRITE_UNIQUE_ID = ID.unique();
 export const APP_WRITE_QUERY = Query;

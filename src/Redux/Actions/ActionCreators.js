@@ -15,7 +15,15 @@ import {
     START_INCOME_EXPENSE_REPORT_LOADING,
     STOP_INCOME_EXPENSE_REPORT_LOADING,
     STORE_INCOME_EXPENSE_REPORT_DATA,
-    CLEAR_INCOME_EXPENSE_REPORT_DATA
+    CLEAR_INCOME_EXPENSE_REPORT_DATA,
+    START_MANAGE_CATEGORY_LOADING,
+    STOP_MANAGE_CATEGORY_LOADING,
+    STORE_USER_CATEGORIES,
+    CLEAR_USER_CATEGORIES,
+    START_UPDATE_LOADING,
+    STOP_UPDATE_LOADING,
+    START_ADD_CATEGORY_LOADING,
+    STOP_ADD_CATEGORY_LOADING
 } from './ActionTypes';
 
 //----------------------------------------------------------
@@ -64,6 +72,19 @@ export const clearUserDetails = () => {
         type : CLEAR_USER_DETAILS
     })
 }
+
+export const startUpdateLoading = () => {
+    return({
+        type : START_UPDATE_LOADING
+    })
+}
+
+export const stopUpdateLoading = () => {
+    return({
+        type : STOP_UPDATE_LOADING
+    })
+}
+
 
 
 //----------------------------------------------------------
@@ -123,14 +144,60 @@ export const stopIncomeExpenseReportLoading = () => {
     })
 }
 
-export const storeIncomeExpenseReportData = () => {
+export const storeIncomeExpenseReportData = (data = []) => {
     return({
-        type : STORE_INCOME_EXPENSE_REPORT_DATA
+        type : STORE_INCOME_EXPENSE_REPORT_DATA,
+        payload : data
     })
 }
 
 export const clearIncomeExpenseReportData = () => {
     return({
         type : CLEAR_INCOME_EXPENSE_REPORT_DATA
+    })
+}
+
+
+//----------------------------------------------------------
+//Category Action creators
+//----------------------------------------------------------
+
+export const startManageCateorgyLoading = () => {
+    return({
+        type : START_MANAGE_CATEGORY_LOADING
+    })
+}
+
+export const stopManageCateorgyLoading = () => {
+    return({
+        type : STOP_MANAGE_CATEGORY_LOADING
+    })
+}
+
+export const storeUserCategoryData = (data = [],DOC_ID) => {
+    return({
+        type : STORE_USER_CATEGORIES,
+        payload : {
+            data,
+            DOC_ID
+        }
+    })
+}
+
+export const clearUserCategoryData = () => {
+    return({
+        type : CLEAR_USER_CATEGORIES
+    })
+}
+
+export const startAddCategoryLoading = () => {
+    return({
+        type : START_ADD_CATEGORY_LOADING
+    })
+}
+
+export const stopAddCategoryLoading = () => {
+    return({
+        type : STOP_ADD_CATEGORY_LOADING
     })
 }

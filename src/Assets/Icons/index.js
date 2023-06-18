@@ -32,6 +32,8 @@ import EmailIcon from "./EmailIcon";
 import LockIcon from "./LockIcon";
 import EyeIcon from "./EyeIcon";
 import EyeOffIcon from "./EyeOffIcon";
+import DeleteOutlineIcon from "./DeleteOutlineIcon";
+import DragIcon from "./DragIcon";
 
 //Categoried Icons
 import TransportationIcon from "./TransportationIcon";
@@ -53,7 +55,7 @@ import ElectronicsIcon from "./ElectronicsIcon";
 import EducationIcon from "./EducationIcon";
 import DonationIcon from "./DonationIcon";
 import CafeIcon from "./CafeIcon";
-import DragIcon from "./DragIcon";
+import HashIcon from './HashIcon';
 
 
 //Category Outline icons
@@ -114,5 +116,7 @@ export {
     EmailIcon,
     LockIcon,
     EyeIcon,
-    EyeOffIcon
+    EyeOffIcon,
+    DeleteOutlineIcon,
+    HashIcon
 }

@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import CommonContainer from '../Components/CommonContainer';
 import { moderateScale, Fonts, Colors } from '../Config/Theme';
@@ -10,6 +10,8 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import ScreenLoader from '../Components/ScreenLoader';
 import { getIncomeExpenseReport } from '../Redux/Actions/IncomeExpense/GetIncomeExpenseReport';
+import CategoryIcon from '../Components/CategoryIcon';
+import { EMPTY } from '../Assets/Images/index';
 
 const HeaderComponent = ({ navigation }) => {
     return (
@@ -51,126 +53,107 @@ const ReportScreen = () => {
         { flex: 0.05, bgColor: '#FFECB3' }
     ]);
 
-    const [listData, setListData] = useState([
-        {
-            icon: TransportationIcon,
-            label: 'Transportation',
-            numOfTransaction: 36,
-            amount: 5300,
-            percentage: 32
-        },
-        {
-            icon: HealthIcon,
-            label: 'Health',
-            numOfTransaction: 16,
-            amount: 3100,
-            percentage: 25
-        },
-        {
-            icon: GroceriesIcon,
-            label: 'Grocery',
-            numOfTransaction: 36,
-            amount: 2320,
-            percentage: 18
-        },
-        {
-            icon: GiftIcon,
-            label: 'Gifts',
-            numOfTransaction: 18,
-            amount: 1440,
-            percentage: 12
-        },
-        {
-            icon: ElectronicsIcon,
-            label: 'Elecronics',
-            numOfTransaction: 12,
-            amount: 800,
-            percentage: 8
-        },
-        {
-            icon: CafeIcon,
-            label: 'Cafe & Bar',
-            numOfTransaction: 10,
-            amount: 240,
-            percentage: 5
-        },
-        {
-            icon: GiftIcon,
-            label: 'Gifts',
-            numOfTransaction: 18,
-            amount: 1440,
-            percentage: 12
-        },
-        {
-            icon: ElectronicsIcon,
-            label: 'Elecronics',
-            numOfTransaction: 12,
-            amount: 800,
-            percentage: 8
-        },
-        {
-            icon: CafeIcon,
-            label: 'Cafe & Bar',
-            numOfTransaction: 10,
-            amount: 240,
-            percentage: 5
-        },
-        {
-            icon: GiftIcon,
-            label: 'Gifts',
-            numOfTransaction: 18,
-            amount: 1440,
-            percentage: 12
-        },
-        {
-            icon: ElectronicsIcon,
-            label: 'Elecronics',
-            numOfTransaction: 12,
-            amount: 800,
-            percentage: 8
-        },
-        {
-            icon: CafeIcon,
-            label: 'Cafe & Bar',
-            numOfTransaction: 10,
-            amount: 240,
-            percentage: 5
-        }
-    ])
-
 
     useEffect(() => {
-        // console.log('--userDetails>>>',userDetails)
-        dispatch(getIncomeExpenseReport(userDetails?.currentUserID));
-    },[]);
+        getReportData();
+    }, []);
 
     const listContainer = ({ item }) => {
-
-        const Icon = item.icon;
 
         return (
             <View style={styles.listContainer}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 0.82 }}>
                     <View style={{ alignItems: 'flex-start', justifyContent: 'center', flex: 0.17 }}>
-                        <Icon />
+                        <CategoryIcon type={item.category} />
                     </View>
                     <View style={{ flex: 0.83 }}>
-                        <Text style={styles.listCategoryName}>{item.label}</Text>
-                        <Text style={styles.listTransactionNumber}>{item.numOfTransaction} transactions</Text>
+                        <Text style={styles.listCategoryName}>{item.category}</Text>
+                        <Text style={styles.listTransactionNumber}>{item.noOfTxn} transactions</Text>
                     </View>
                 </View>
                 <View style={{ flex: 0.18, alignItems: 'flex-end' }}>
                     <Text style={styles.listAmount}>{Number(item.amount).toLocaleString('en', { currency: 'INR', style: 'currency', maximumFractionDigits: 1, minimumFractionDigits: 1 })}</Text>
-                    <Text style={styles.listPercentage}>{item.percentage}%</Text>
+                    <Text style={styles.listPercentage}>{item?.percentage}%</Text>
                 </View>
             </View>
         )
+    }
+
+    const getReportData = () => {
+        dispatch(getIncomeExpenseReport(userDetails?.user_id));
     }
 
     const onChange = (event, selectedDate) => {
         setShowDatePicker(false)
         setSelectedDate(selectedDate);
     };
+
+    const renderBodyData = () => {
+        if (incomeExpenseReportData.length == 0) {
+            return (
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={false}
+                            onRefresh={() => getReportData()}
+                        />
+                    }
+                    contentContainerStyle={{
+                        flexGrow : 1,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Image
+                        source={EMPTY}
+                        style={{
+                            width: '50%',
+                            height: '50%',
+                            aspectRatio: 1
+                        }}
+                        resizeMode={'contain'}
+                    />
+                    <Text style={styles.emptyLabelStyle}>History not available</Text>
+                </ScrollView>
+            )
+        }
+
+        return (
+            <>
+                <View style={{ marginVertical: moderateScale(4) }}>
+                    <Text style={styles.overviewLabelStyle}>OVERVIEW</Text>
+                    <View style={styles.spendDashboardContaienr}>
+                        {
+                            incomeExpenseReportData.map((element, index) => {
+                                return (
+                                    <View key={index} style={{ height: '100%', backgroundColor: cartPercentage[index].bgColor, flex: (element.percentage) / 10 }} />
+                                )
+                            })
+                        }
+                    </View>
+                </View>
+
+                <View style={{ marginTop: moderateScale(5), flex: 1 }}>
+                    <Text style={{ ...styles.overviewLabelStyle, marginBottom: moderateScale(5) }}>DETAILS</Text>
+
+                    <View style={{ flex: 1 }}>
+                        <FlatList
+                            refreshing={false}
+                            data={incomeExpenseReportData}
+                            keyExtractor={(_, index) => index.toString()}
+                            contentContainerStyle={{ paddingVertical: moderateScale(5) }}
+                            showsVerticalScrollIndicator={false}
+                            legacyImplementation={true}
+                            maxToRenderPerBatch={10}
+                            nestedScrollEnabled={true}
+                            renderItem={listContainer}
+                            onRefresh={() => getReportData()}
+                        />
+                    </View>
+                </View>
+            </>
+        )
+    }
 
     return (
         <CommonContainer
@@ -180,7 +163,7 @@ const ReportScreen = () => {
 
             <ScreenLoader isVisiable={incomeExpenseReportLoading} />
 
-            <View style={{flex : 1}}>
+            <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: moderateScale(48) }}>
                     <TouchableOpacity
                         activeOpacity={0.8}
@@ -203,34 +186,8 @@ const ReportScreen = () => {
                     </TouchableOpacity>
                 </View>
 
-                <View style={{ marginVertical: moderateScale(4) }}>
-                    <Text style={styles.overviewLabelStyle}>OVERVIEW</Text>
-                    <View style={styles.spendDashboardContaienr}>
-                        {
-                            cartPercentage.map((element, index) => {
-                                return (
-                                    <View key={index} style={{ height: '100%', backgroundColor: element.bgColor, flex: element.flex }} />
-                                )
-                            })
-                        }
-                    </View>
-                </View>
-
-                <View style={{ marginTop: moderateScale(5), flex : 1 }}>
-                    <Text style={{...styles.overviewLabelStyle, marginBottom : moderateScale(5)}}>DETAILS</Text>
-
-                    <View style={{flex : 1}}>
-                        <FlatList
-                            data={listData}
-                            keyExtractor={(_, index) => index.toString()}
-                            contentContainerStyle={{ paddingVertical : moderateScale(5) }}
-                            showsVerticalScrollIndicator={false}
-                            legacyImplementation={true}
-                            maxToRenderPerBatch={10}
-                            nestedScrollEnabled={true}
-                            renderItem={listContainer}
-                        />
-                    </View>
+                <View style={{ flex: 1 }}>
+                    {renderBodyData()}
                 </View>
             </View>
 
@@ -353,5 +310,10 @@ const styles = StyleSheet.create({
         fontSize: moderateScale(14),
         color: Colors.WHITE,
         marginLeft: moderateScale(8)
-    }
+    },
+	emptyLabelStyle : {
+		fontFamily : Fonts.Bold,
+		fontSize : moderateScale(18),
+		color : Colors.GREY_600
+	}
 })
